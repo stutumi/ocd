@@ -1,5 +1,5 @@
 .data
-        #### Configuração do Labirinto  ####
+    ####### Configuração do Labirinto  #######
         maze: .byte 'X','_','_','_','_'
               .byte '_','#','#','#','#'
               .byte '_','_','_','_','_'
@@ -11,7 +11,7 @@
         elem: .word 25   #elementos na matriz
 
      visited: .byte 0:25 #visitados memset(0)
-       ######################################
+    ############################################
 
      newline: .byte '\n'
         
@@ -155,8 +155,8 @@
             j dfs_loop
             
     dfs_found_end:
-            li $v0, 1 #retorna true
-            j dfs_return
+        li $v0, 1 #retorna true
+        j dfs_return
     
     dfs_loop_end:
         li $v0, 0 #retorna false
@@ -200,7 +200,7 @@
         mflo $t0
         addu $t0, $t0, $a1
 
-        #checa se a posicao ja foi visitedada
+        #checa se a posicao ja foi visitada
         lb $t1, visited($t0) 
         bgtz $t1, coord_invalid
         
