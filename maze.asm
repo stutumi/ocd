@@ -29,9 +29,10 @@
      str_sol: .asciiz "Solução do Labirinto:\n\n"
       str_no: .asciiz "O Labirinto não possui solução.\n"
 .text
+    #macro para imprimir uma string, recebe o ponteiro da string como arg
     .macro print_str($arg)
         la $a0, $arg
-        li $v0, 4
+        li $v0, 4 #print_string
         syscall
     .end_macro
 
