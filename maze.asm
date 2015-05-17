@@ -60,7 +60,7 @@
         print_str(str_no)
         j exit
    
-   exit:
+    exit:
         li $v0, 10
         syscall
 
@@ -100,59 +100,59 @@
         li $s3, 0 #i = 0
     
     dfs_loop:
-            beq $s3, 32, dfs_loop_end #repete o loop para 8 words, consumindo 2 por iteração
-            
-            #lê 2 inteiros, variação de x e y
-            lw $t0,   pos($s3) #varx
-            lw $t1, pos+4($s3) #vary
-            
-            addi $s3, $s3, 8 #i+=2
+        beq $s3, 32, dfs_loop_end #repete o loop para 8 words, consumindo 2 por iteração
 
-            #gera e salva o novox e novoy
-            add $s4, $s0, $t0 #novox = x+varx
-            add $s5, $s1, $t1 #novoy = y+vary
+        #lê 2 inteiros, variação de x e y
+        lw $t0,   pos($s3) #varx
+        lw $t1, pos+4($s3) #vary
+        
+        addi $s3, $s3, 8 #i+=2
 
-            #chama coord_check(novox, novoy)
-            move $a0, $s4 #novox
-            move $a1, $s5 #novoy
-            jal coord_check
+        #gera e salva o novox e novoy
+        add $s4, $s0, $t0 #novox = x+varx
+        add $s5, $s1, $t1 #novoy = y+vary
 
-            #se retornar 0, ignora pois é uma coordenada inválida
-            beqz $v0, dfs_loop
+        #chama coord_check(novox, novoy)
+        move $a0, $s4 #novox
+        move $a1, $s5 #novoy
+        jal coord_check
 
-            #guarda a posicao (pos = x*n+y) da nova coordenada
-            move $s2, $v0 
-            
-            #carrega nos registradores temporários os caracteres
-            lb $t0, maze($s2)
-            lb $t1, end
-            lb $t2, walkable 
+        #se retornar 0, ignora pois é uma coordenada inválida
+        beqz $v0, dfs_loop
 
-            #encontrou o caractere do fim, retorna true
-            beq $t0, $t1, dfs_found_end
-            
-            #encontrou uma parede, ignora e passa para a próxima iteração
-            bne $t0, $t2, dfs_loop
-            
-            #muda o maze[novox][novoy] para o caractere "walked"
-            lb $t3, walked
-            sb $t3, maze($s2)
+        #guarda a posicao (pos = x*n+y) da nova coordenada
+        move $s2, $v0 
+        
+        #carrega nos registradores temporários os caracteres
+        lb $t0, maze($s2)
+        lb $t1, end
+        lb $t2, walkable 
 
-            #chamada recursiva dfs(novox, novoy)
-            move $a0, $s4
-            move $a1, $s5
-            jal dfs
+        #encontrou o caractere do fim, retorna true
+        beq $t0, $t1, dfs_found_end
+        
+        #encontrou uma parede, ignora e passa para a próxima iteração
+        bne $t0, $t2, dfs_loop
+        
+        #muda o maze[novox][novoy] para o caractere "walked"
+        lb $t3, walked
+        sb $t3, maze($s2)
 
-            #se achou na chamada recursiva, retorna true
-            bnez $v0, dfs_found_end
+        #chamada recursiva dfs(novox, novoy)
+        move $a0, $s4
+        move $a1, $s5
+        jal dfs
 
-            #backtracking, como não achou nas chamadas recursivas pode remover o "walked" de maze[novox][novoy]
-            #pois ele não faz parte de um caminho válido
-            lb $t3, walkable
-            sb $t3, maze($s2)
+        #se achou na chamada recursiva, retorna true
+        bnez $v0, dfs_found_end
 
-            #próxima iteração
-            j dfs_loop
+        #backtracking, como não achou nas chamadas recursivas pode remover o "walked" de maze[novox][novoy]
+        #pois ele não faz parte de um caminho válido
+        lb $t3, walkable
+        sb $t3, maze($s2)
+
+        #próxima iteração
+        j dfs_loop
             
     dfs_found_end:
         li $v0, 1 #retorna true
@@ -183,7 +183,7 @@
    #a1 = y
    coord_check:
         #salva o endereço de retorno da função
-        addi $sp, $sp, -4
+        subu $sp, $sp, 4
         sw $ra, 0($sp)
 
         #carrega o tamanho da linha do labirinto
@@ -204,24 +204,24 @@
         lb $t1, visited($t0) 
         bgtz $t1, coord_invalid
         
-  coord_valid:
-    move $v0, $t0 #retorna o endereço da coordenada no maze
-    j coord_end
+    coord_valid:
+        move $v0, $t0 #retorna o endereço da coordenada no maze
+        j coord_end
     
-  coord_invalid:
-    li $v0 0 #define retorno como 0: inválido
-    j coord_end
+    coord_invalid:
+        li $v0 0 #define retorno como 0: inválido
+        j coord_end
 
-   coord_end:
-    #carrega o endereço de retorno da função e pula para ele
-    lw $ra, 0($sp)
-    addi $sp, $sp, 4
-    jr $ra
+    coord_end:
+        #carrega o endereço de retorno da função e pula para ele
+        lw $ra, 0($sp)
+        addiu $sp, $sp, 4
+        jr $ra
         
 
     print:
         #salva o endereço de retorno da função
-        addi $sp, $sp, -4
+        subu $sp, $sp, 4
         sw $ra, 0($sp)
 
         #prepara para impressão
@@ -257,6 +257,6 @@
         li $v0, 4
         syscall
         lw $ra, 0($sp)
-        addi $sp, $sp, 4
+        addiu $sp, $sp, 4
         jr $ra
 
