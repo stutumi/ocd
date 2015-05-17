@@ -174,7 +174,7 @@
         lw $s4, 8($sp)
         lw $s5, 4($sp)
 
-        #drecrementa a pilha
+        #decrementa a pilha
         addiu $sp, $sp, 32
 
         #pula para o endereço de retorno da função
