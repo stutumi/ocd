@@ -6,6 +6,8 @@
               .byte '#','#','#','#','_'
               .byte '#','#','#','#','X'
 
+       start: .word 0, 0
+
         size: .word 5    #elementos por linha 
 
         elem: .word 25   #elementos na matriz
@@ -41,9 +43,10 @@
         print_str(str_ori)
         jal print
 
-        #chama dfs(0, 0)
-        li $a0, 0
-        li $a1, 0
+        #chama dfs(start.x, start.y)
+        la $t0, start
+        lw $a0, 0($t0)
+        lw $a1, 4($t0)
         jal dfs
 
         #se o retorno for 0, não existe solução
