@@ -6,7 +6,7 @@
               .byte '#','#','#','#','_'
               .byte '#','#','#','#','X'
 
-       start: .word 0, 0
+       start: .word 0, 0 #x, y iniciais
 
         size: .word 5    #elementos por linha 
 
