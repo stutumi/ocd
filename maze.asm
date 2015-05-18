@@ -47,17 +47,17 @@
         jal dfs
 
         #se o retorno for 0, não existe solução
-        beqz $v0, no_solution
+        beqz $v0, solution_notfound
 
         #caso contrário, "maze" conterá a solucão
-        j has_solution
+        j solution_found
 
-    has_solution:
+    solution_found:
         print_str(str_sol)
         jal print
         j exit
     
-    no_solution:
+    solution_notfound:
         print_str(str_no)
         j exit
    
@@ -79,8 +79,8 @@
         sw $s1, 20($sp)
         sw $s2, 16($sp)
         sw $s3, 12($sp)
-        sw $s4, 8($sp)
-        sw $s5, 4($sp)
+        sw $s4,  8($sp)
+        sw $s5,  4($sp)
 
         #salva x e y originais
         move $s0, $a0
@@ -130,7 +130,7 @@
         lb $t2, walkable 
 
         #encontrou o caractere do fim, retorna true
-        beq $t0, $t1, dfs_found_end
+        beq $t0, $t1, dfs_found
         
         #encontrou uma parede, ignora e passa para a próxima iteração
         bne $t0, $t2, dfs_loop
@@ -145,7 +145,7 @@
         jal dfs
 
         #se achou na chamada recursiva, retorna true
-        bnez $v0, dfs_found_end
+        bnez $v0, dfs_found
 
         #backtracking, como não achou nas chamadas recursivas pode remover o "walked" de maze[novox][novoy]
         #pois ele não faz parte de um caminho válido
@@ -154,14 +154,14 @@
 
         #próxima iteração
         j dfs_loop
-            
-    dfs_found_end:
-        li $v0, 1 #retorna true
-        j dfs_return
-    
+
     dfs_loop_end:
         li $v0, 0 #retorna false
-        
+        j dfs_return
+
+    dfs_found:
+        li $v0, 1 #retorna true
+  
     dfs_return:
         #carrega o endereço de retorno
         lw $ra, 28($sp)
@@ -171,8 +171,8 @@
         lw $s1, 20($sp)
         lw $s2, 16($sp)
         lw $s3, 12($sp)
-        lw $s4, 8($sp)
-        lw $s5, 4($sp)
+        lw $s4,  8($sp)
+        lw $s5,  4($sp)
 
         #decrementa a pilha
         addiu $sp, $sp, 32
@@ -211,7 +211,6 @@
     
     coord_invalid:
         li $v0 0 #define retorno como 0: inválido
-        j coord_end
 
     coord_end:
         #carrega o endereço de retorno da função e pula para ele
