@@ -6,10 +6,10 @@
               .byte '#','#','#','#','_'
               .byte '#','#','#','#','X'
 
-       start: .word 0, 0 #x, y iniciais
+       start: .word 0, 0
 
-        size: .word 5    #elementos por linha 
-
+        size: .word 5    #linhas   (size) => x
+              .word 5    #colunas 4(size) => y
         elem: .word 25   #elementos na matriz
 
      visited: .byte 0:25 #visitados memset(0)
@@ -141,6 +141,7 @@
         #muda o maze[novox][novoy] para o caractere "walked"
         lb $t3, walked
         sb $t3, maze($s2)
+       # jal print
 
         #chamada recursiva dfs(novox, novoy)
         move $a0, $s4
@@ -154,6 +155,7 @@
         #pois ele não faz parte de um caminho válido
         lb $t3, walkable
         sb $t3, maze($s2)
+      #  jal print
 
         #próxima iteração
         j dfs_loop
