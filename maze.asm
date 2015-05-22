@@ -1,19 +1,23 @@
 .data
-    ####### Configuração do Labirinto  #######
-        maze: .byte 'X','_','_','_','_'
+    ################# Configuração do Labirinto  #################
+        maze: .byte 'X','#','_','_','_'
               .byte '_','#','#','#','#'
               .byte '_','_','_','_','_'
               .byte '#','#','#','#','_'
               .byte '#','#','#','#','X'
 
-       start: .word 0, 0
+       start: .word 0    #x do início
+              .word 0    #y do início
 
         size: .word 5    #linhas   (size) => x
               .word 5    #colunas 4(size) => y
+
+        step: .byte -1   #passo-a-passo: -1: não mostra, 1: mostra
+
         elem: .word 25   #elementos na matriz
 
      visited: .byte 0:25 #visitados memset(0)
-    ############################################
+    ##################### Variáveis Internas #####################
 
      newline: .byte '\n'
         
@@ -30,6 +34,7 @@
      str_ori: .asciiz "Labirinto Original:\n\n"
      str_sol: .asciiz "Solução do Labirinto:\n\n"
       str_no: .asciiz "O Labirinto não possui solução.\n"
+    ###############################################################
 .text
     #macro para imprimir uma string, recebe o ponteiro da string como arg
     .macro print_str($arg)
@@ -42,6 +47,21 @@
         #exibe o labirinto original
         print_str(str_ori)
         jal print
+
+        #resolve o labirinto
+        jal solve
+
+    exit:
+        li $v0, 10
+        syscall
+
+    ###
+    ### Chama a função que resolve o labirinto e verifica se foi resolvido ou não, imprimindo o resultado.
+    ###
+    solve:
+        #salva o endereço de retorno da função
+        subu $sp, $sp, 4
+        sw $ra, 0($sp)
 
         #chama dfs(start.x, start.y)
         la $t0, start
@@ -58,18 +78,31 @@
     solution_found:
         print_str(str_sol)
         jal print
-        j exit
+        j solution_end
     
     solution_notfound:
         print_str(str_no)
-        j exit
-   
-    exit:
-        li $v0, 10
-        syscall
 
-   #a0 = x => $s0
-   #a1 = y => $s1
+    solution_end:
+        lw $ra, 0($sp)
+        addiu $sp, $sp, 4
+        jr $ra
+
+
+   ###
+   ### Busca em profundidade recursiva, tenta chegar 
+   ### ao fim do labirinto enquanto existirem movimentos válidos
+   ### Parâmetros: $a0 = x, $a1 = y
+   ### Utiliza os seguintes registradores preservados pela chamada:
+   ### $s0 = x
+   ### $s1 = y
+   ### $s2 = novox*linhas+novoy
+   ### $s3 = contador de variações
+   ### $s4 = novox (variação do x)
+   ### $s5 = novoy (variação do y)
+   ### Retorno: $v0 contendo 0 para sem solução ou 1 para com solução
+   ### Caso tenha solução, a solução estará no "maze"
+   ###
    dfs:
         #aloca espaço na pilha
         subu $sp, $sp, 32
@@ -141,7 +174,9 @@
         #muda o maze[novox][novoy] para o caractere "walked"
         lb $t3, walked
         sb $t3, maze($s2)
-       # jal print
+
+        lb $t5, step
+        bgezal $t5, print
 
         #chamada recursiva dfs(novox, novoy)
         move $a0, $s4
@@ -155,7 +190,9 @@
         #pois ele não faz parte de um caminho válido
         lb $t3, walkable
         sb $t3, maze($s2)
-      #  jal print
+        
+        lb $t5, step
+        bgezal $t5, print
 
         #próxima iteração
         j dfs_loop
@@ -185,8 +222,11 @@
         #pula para o endereço de retorno da função
         jr $ra
 
-   #a0 = x
-   #a1 = y
+   ###
+   ### Checa se a coordenada é válida, checando se está dentro da range permitida
+   ### e se a posição não foi visitada.
+   ### Parâmetros: $a0 = x, $a1 = y
+   ###
    coord_check:
         #salva o endereço de retorno da função
         subu $sp, $sp, 4
@@ -222,8 +262,10 @@
         lw $ra, 0($sp)
         addiu $sp, $sp, 4
         jr $ra
-        
-
+    
+    ###
+    ### Exibe o labirinto contido em "maze"
+    ###
     print:
         #salva o endereço de retorno da função
         subu $sp, $sp, 4
@@ -264,4 +306,3 @@
         lw $ra, 0($sp)
         addiu $sp, $sp, 4
         jr $ra
-
