@@ -1,6 +1,6 @@
 .data
     ################# Configuração do Labirinto  #################
-        maze: .byte 'X','#','_','_','_'
+        maze: .byte 'X','_','_','_','_'
               .byte '_','#','#','#','#'
               .byte '_','_','_','_','_'
               .byte '#','#','#','#','_'
@@ -12,7 +12,7 @@
         size: .word 5    #linhas   (size) => x
               .word 5    #colunas 4(size) => y
 
-        step: .byte -1   #passo-a-passo: -1: não mostra, 1: mostra
+        step: .byte 1   #passo-a-passo: -1: não mostra, 1: mostra
 
         elem: .word 25   #elementos na matriz
 
@@ -33,6 +33,7 @@
      
      str_ori: .asciiz "Labirinto Original:\n\n"
      str_sol: .asciiz "Solução do Labirinto:\n\n"
+    str_step: .asciiz "Passo a passo do algoritmo:\n\n"
       str_no: .asciiz "O Labirinto não possui solução.\n"
     ###############################################################
 .text
@@ -63,6 +64,9 @@
         subu $sp, $sp, 4
         sw $ra, 0($sp)
 
+        lb $t5, step
+        bgezal $t5, step_str
+
         #chama dfs(start.x, start.y)
         la $t0, start
         lw $a0, 0($t0)
@@ -76,17 +80,29 @@
         j solution_found
 
     solution_found:
-        print_str(str_sol)
+        print_str(str_sol) #chama a macro para imprimir str_sol
         jal print
-        j solution_end
+        j solve_end
     
     solution_notfound:
-        print_str(str_no)
+        print_str(str_no) #chama a macro para imprimir str_no
 
-    solution_end:
+    solve_end:
+        #carrega o endereço de retorno da função e pula para ele
         lw $ra, 0($sp)
         addiu $sp, $sp, 4
         jr $ra
+
+    step_str:
+        #salva o endereço de retorno da função
+        subu $sp, $sp, 4
+        sw $ra, 0($sp)
+        print_str(str_step)
+        #carrega o endereço de retorno da função e pula para ele
+        lw $ra, 0($sp)
+        addiu $sp, $sp, 4
+        jr $ra
+
 
 
    ###
