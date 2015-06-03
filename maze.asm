@@ -12,7 +12,7 @@
         size: .word 5    #linhas   (size) => x
               .word 5    #colunas 4(size) => y
 
-        step: .byte 1   #passo-a-passo: -1: não mostra, 1: mostra
+        step: .byte -1   #passo-a-passo: -1: não mostra, 1: mostra
 
         elem: .word 25   #elementos na matriz
 

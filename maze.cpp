@@ -18,6 +18,8 @@ int pos[4][2] = {{0, -1},
                  {-1, 0},
                  { 1, 0}};
 
+int step = -1; 
+
 void printmaze() {
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
@@ -37,8 +39,10 @@ bool dfs(int x, int y) {
             if (maze[novox][novoy] == 'X') return true;
             if (maze[novox][novoy] == '_') {
                 maze[novox][novoy] = 'o';
+                if (step < 0) printmaze();
                 if (dfs(novox, novoy)) return true;
                 maze[novox][novoy] = '_';
+                if (step < 0) printmaze();
             }
         }
     }
